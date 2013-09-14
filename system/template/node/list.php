@@ -1,0 +1,19 @@
+<?php namespace System\Template\Node;
+
+class ListNode extends Node
+{
+    protected $nodes;
+
+    public function __construct($nodes, $line)
+    {
+        parent::__construct($line);
+        $this->nodes = $nodes;
+    }
+
+    public function compile($compiler, $indent = 0)
+    {
+        foreach ($this->nodes as $node) {
+            $node->compile($compiler, $indent);
+        }
+    }
+}

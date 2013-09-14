@@ -1,0 +1,6 @@
+app/cache/*
+.travis.yml
+
+app/config/app.php
+
+app/config/database.php
