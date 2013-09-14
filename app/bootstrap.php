@@ -2,7 +2,7 @@
 
 add_admin_module();
 
-add_modules('comments', 'avatar');
+add_modules('markdown', 'avatar', 'comments');
 
 add_site_theme();
 

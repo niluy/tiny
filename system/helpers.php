@@ -46,6 +46,7 @@ function call_module_init( $module )
 }
 function require_file($file)
 {
+    if(!file_exists($file)) return;
     require_once $file;
 }
 function require_path($path) {

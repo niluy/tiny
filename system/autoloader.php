@@ -4,10 +4,10 @@ class Autoloader
 {
     public static $aliases = array();
     public static $paths = array();
-	public static function register()
-	{
+    public static function register()
+    {
         spl_autoload_register(array(__CLASS__, 'load'));
-	}
+    }
     public static function load($class) {
         if(array_key_exists(strtolower($class), array_change_key_case(static::$aliases))) {
             return class_alias(static::$aliases[$class], $class);

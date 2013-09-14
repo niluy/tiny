@@ -21,13 +21,17 @@ function apply_filters($tag, $value)
     {
         foreach ($functions as $function)
         {
-            if(is_callable('\\System\\'.$function))
+            if(is_callable($function))
+            {
+                $value = call_user_func_array($function, array($value));
+            }
+            elseif(is_array($function) and is_callable($func = $function[1]))
+            {
+                $value = call_user_func($func, $value);
+            }
+            elseif(is_string($function) and is_callable('\\System\\'.$function))
             {
                 $value = call_user_func('\\System\\'.$function, $value);
-            }
-            elseif(is_callable($function))
-            {
-                $value = call_user_func($function, $value);
             }
         }
     }

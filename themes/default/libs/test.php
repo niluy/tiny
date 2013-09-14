@@ -1,6 +1,6 @@
 <?php
 
 function r() {
-	global $end;
-	return $end;
+    global $end;
+    return $end;
 }

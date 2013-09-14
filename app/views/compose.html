@@ -4,7 +4,7 @@
 
 {% block content %}
     <form class="compose" action="{{ site_url('compose') }}" method="POST">
-    	<p>
+        <p>
             <label for="_title">{{ __('Title') }}</label>
             <input type="text" name="title" id="_title" value="{{ post.title|e }}">
         </p>
