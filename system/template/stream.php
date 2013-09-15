@@ -1,6 +1,6 @@
 <?php namespace System\Template;
 
-class TokenStream
+class Stream
 {
     protected $name;
     protected $tokens;

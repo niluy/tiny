@@ -6,7 +6,7 @@ class Avatar extends Module
     {
         $this->addAlias('author_avatar', 'avatar_cache');
     }
-    public static function avatar_cache($avatar)
+    public function avatar_cache($avatar)
     {
         $url = Config::app('url');
         $t = 604800;

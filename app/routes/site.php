@@ -1,6 +1,10 @@
 <?php
 
-Route::get('/', function()
+Route::get('/',function() {
+    \System\Template::render();
+});
+
+Route::get('/home', function()
 {
     $perpage = 5;
     $page = 1;

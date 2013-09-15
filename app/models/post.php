@@ -28,8 +28,4 @@ class Post extends Model
     {
         return '<a href="/admin/post/delete/'.$this->id.'">'.$text.'</a>';
     }
-    public function comments()
-    {
-        return Comment::where('post_id','=',$this->id)->where('approved','=',1)->sort('date','DESC')->get();
-    }
 }

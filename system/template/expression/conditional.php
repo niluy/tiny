@@ -1,4 +1,4 @@
-<?php namespace System\Template\Expression;
+<?php namespace System\Template;
 
 class ConditionalExpression extends Expression
 {

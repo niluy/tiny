@@ -18,6 +18,7 @@ class View
                 $path = APP.'views';
             }
             static::$$name = new Loader(array(
+                'mode' => 0,
                 'source' => $path,
                 'target' => APP.'cache/templates',
             ));

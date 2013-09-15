@@ -15,9 +15,9 @@ class Autoloader
         $lower = strtolower($class);
         $lower = explode('\\', $lower);
         $name = array_pop($lower);
-        preg_match('/(\w+)(node\b|expression\b)/i', $name, $matches);
-        if($matches) {
-            $name = $matches[1];
+        if (preg_match('/(\w+)(node\b|expression\b)/i', $name, $matches) )
+        {
+            $name = $matches[2].'/'.$matches[1];
         }
         if(is_readable($path = PATH . implode('/', $lower) . DS . $name . EXT))
         {

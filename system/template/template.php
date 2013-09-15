@@ -6,17 +6,15 @@ use Exception;
 abstract class Template
 {
     protected $loader;
-    protected $helpers;
     protected $parent;
     protected $blocks;
     protected $macros;
     protected $imports;
     protected $stack;
 
-    public function __construct($loader, $helpers = array())
+    public function __construct($loader)
     {
         $this->loader  = $loader;
-        $this->helpers = $helpers;
         $this->parent  = null;
         $this->blocks  = array();
         $this->macros  = array();
@@ -27,11 +25,11 @@ abstract class Template
     public function loadExtends($template)
     {
         try {
-            return $this->loader->load($template, static::NAME);
+            return $this->loader->load($template, static::PATH);
         } catch (Exception $e) {
             throw new RuntimeException(sprintf(
                 'error extending %s (%s) from %s line %d',
-                $template, $e->getMessage(), static::NAME,
+                $template, $e->getMessage(), static::PATH,
                 $this->getLineTrace($e)
             ));
         }
@@ -40,24 +38,37 @@ abstract class Template
     public function loadInclude($template)
     {
         try {
-            return $this->loader->load($template, static::NAME);
+            return $this->loader->load($template, static::PATH);
         } catch (Exception $e) {
             throw new RuntimeException(sprintf(
                 'error including %s (%s) from %s line %d',
-                $template, $e->getMessage(), static::NAME,
+                $template, $e->getMessage(), static::PATH,
                 $this->getLineTrace($e)
             ));
         }
     }
 
+    public function loadModule($module, $args)
+    {
+        try {
+            return \System\call_module_ui($module, $args);
+        } catch (Exception $e) {
+            throw new RuntimeException(sprintf(
+                'error module %s (%s) from %s line %d',
+                $template, $e->getMessage(), static::PATH,
+                $this->getLineTrace($e)
+            ));
+        }  
+    }
+
     public function loadImport($template)
     {
         try {
-            return $this->loader->load($template, static::NAME);
+            return $this->loader->load($template, static::PATH);
         } catch (Exception $e) {
             throw new RuntimeException(sprintf(
                 'error importing %s (%s) from %s line %d',
-                $template, $e->getMessage(), static::NAME,
+                $template, $e->getMessage(), static::PATH,
                 $this->getLineTrace($e)
             ));
         }
@@ -91,7 +102,7 @@ abstract class Template
             throw new RuntimeException(
                 sprintf(
                     'undefined macro "%s" in %s line %d',
-                    $name, static::NAME, $this->getLineTrace()
+                    $name, static::PATH, $this->getLineTrace()
                 )
             );
         }
@@ -137,10 +148,7 @@ abstract class Template
         $name = array_shift($args);
 
         try {
-            if (isset($this->helpers[$name]) &&
-                is_callable($this->helpers[$name])) {
-                return call_user_func_array($this->helpers[$name], $args);
-            } elseif (is_callable("\\System\\$name")) {
+            if (is_callable("\\System\\$name")) {
                 return call_user_func_array("\\System\\$name", $args);
             } elseif (is_callable($name)) {
                 return call_user_func_array($name, $args);
@@ -149,7 +157,7 @@ abstract class Template
             throw new RuntimeException(
                 sprintf(
                     '%s in %s line %d',
-                    $e->getMessage(), static::NAME, $this->getLineTrace($e)
+                    $e->getMessage(), static::PATH, $this->getLineTrace($e)
                 )
             );
         }
@@ -157,7 +165,7 @@ abstract class Template
         throw new RuntimeException(
             sprintf(
                 'undefined helper "%s" in %s line %d',
-                $name, static::NAME, $this->getLineTrace()
+                $name, static::PATH, $this->getLineTrace()
             )
         );
 
@@ -175,6 +183,10 @@ abstract class Template
     {
         return new Context($seq, isset($context['loop']) ?
             $context['loop'] : null);
+    }
+    public function getModule($module)
+    {
+        return null;
     }
     public function getAttr($obj, $attr, $args = array())
     {
@@ -247,7 +259,7 @@ abstract class Template
                         throw new RuntimeException(
                             sprintf(
                                 'invalid object attribute (%s) in %s line %d',
-                                $token, static::NAME, $this->getLineTrace()
+                                $token, static::PATH, $this->getLineTrace()
                             )
                         );
                     }

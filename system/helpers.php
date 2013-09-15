@@ -44,6 +44,18 @@ function call_module_init( $module )
         call_user_func_array(array(new $module, '__init'), array());
     }*/
 }
+function call_module_ui($module, $args)
+{
+    global $modules;
+    if ( isset($modules) and isset($modules[$module])) {
+        return call_user_func_array($modules[$module], $args);
+    }
+}
+function add_module_ui($module, $function)
+{
+    global $modules;
+    $modules[$module] = $function;
+}
 function require_file($file)
 {
     if(!file_exists($file)) return;

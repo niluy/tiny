@@ -6,6 +6,6 @@
 
     {% include 'content.html' %}
 
-    {% include 'comments.html' %}
+    {% module comments(post.id) %}
 
 {% endblock %}

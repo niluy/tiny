@@ -3,6 +3,20 @@
 class Comment extends Model
 {
     public static $table = 'comments';
+    public static function getByPostId($pid = 0)
+    {
+        return Comment::where('post_id','=',$pid)
+            ->where('approved','=',1)
+            ->sort('date','DESC')
+            ->get();
+    }
+    public static function getByParentId($parent = 0)
+    {
+        return Comment::where('parent','=',$parent)
+            ->where('approved','=',1)
+            ->sort('date','DESC')
+            ->get();
+    }
     public function author()
     {
         return array(

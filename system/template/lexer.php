@@ -55,7 +55,7 @@ class Lexer
             $tokens[] = $token = $this->next();
         } while ($token->getType() !== Token::EOF_TYPE);
 
-        return new TokenStream($this->name, $tokens);
+        return new Stream($this->name, $tokens);
     }
 
     protected function next()

@@ -1,4 +1,4 @@
-<?php namespace System\Template\Node;
+<?php namespace System\Template;
 
 class DisplayBlockNode extends Node
 {

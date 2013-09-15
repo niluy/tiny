@@ -1,4 +1,4 @@
-<?php namespace System\Template\Node;
+<?php namespace System\Template;
 
 use \System\Template\Loader;
 
@@ -33,7 +33,7 @@ class ModuleNode extends Node
         $compiler->raw("class $class extends \\System\\Template\\Template\n", $indent);
         $compiler->raw("{\n", $indent);
 
-        $compiler->raw('const NAME = ', $indent + 1);
+        $compiler->raw('const PATH = ', $indent + 1);
         $compiler->repr($this->name);
         $compiler->raw(";\n\n");
 

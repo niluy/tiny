@@ -1,47 +1,19 @@
 <?php namespace System\Template;
 
-use \System\Template\Node\BlockNode;
-use \System\Template\Node\DisplayBlockNode;
-use \System\Template\Node\BreakNode;
-use \System\Template\Node\ContinueNode;
-use \System\Template\Node\ExtendsNode;          // 与extends冲突，避免重命名
-use \System\Template\Node\ForNode;
-use \System\Template\Node\IfNode;
-use \System\Template\Node\ImportNode;
-use \System\Template\Node\IncludeNode;         // 与include冲突，避免重命名
-use \System\Template\Node\ListNode;
-use \System\Template\Node\MacroNode;
-use \System\Template\Node\ModuleNode;
-use \System\Template\Node\Node;
-use \System\Template\Node\OutputNode;
-use \System\Template\Node\ParentNode;      // 避免重命名
-use \System\Template\Node\SetNode;
-use \System\Template\Node\TextNode;
+/*
+use \System\Template\Node\BlockNode, DisplayBlockNode, BreakNode, 
+    ContinueNode, ExtendsNode,ForNode,IfNode,ImportNode,
+    IncludeNode,ModulesNode,ListNode,MacroNode,ModuleNode,Node,
+    OutputNode,ParentNode,SetNode,TextNode;
 
-use \System\Template\Expression\AndExpression;  //
-use \System\Template\Expression\AddExpression;
-use \System\Template\Expression\ArrayExpression;
-use \System\Template\Expression\AttributeExpression;
-use \System\Template\Expression\CompareExpression;
-use \System\Template\Expression\ConcatExpression;
-use \System\Template\Expression\ConditionalExpression;
-use \System\Template\Expression\ConstantExpression;
-use \System\Template\Expression\DivExpression;
-use \System\Template\Expression\Expression;
-use \System\Template\Expression\FilterExpression;
-use \System\Template\Expression\FunctionCallExpression;
-use \System\Template\Expression\InclusionExpression;
-use \System\Template\Expression\MacroExpression;
-use \System\Template\Expression\ModExpression;
-use \System\Template\Expression\MulExpression;
-use \System\Template\Expression\NameExpression;
-use \System\Template\Expression\NegExpression;
-use \System\Template\Expression\NotExpression;
-use \System\Template\Expression\OrExpression;    //
-use \System\Template\Expression\PosExpression;
-use \System\Template\Expression\StringExpression;  //
-use \System\Template\Expression\SubExpression;
-use \System\Template\Expression\XorExpression;    //
+use \System\Template\Expression\AndExpression,AddExpression,ArrayExpression,
+    AttributeExpression,CompareExpression,ConcatExpression,
+    ConditionalExpression,ConstantExpression,DivExpression,Expression,
+    FilterExpression,FunctionCallExpression,InclusionExpression,
+    MacroExpression,ModExpression,MulExpression,NameExpression,
+    NegExpression,NotExpression,OrExpression,PosExpression,
+    StringExpression,SubExpression,XorExpression;
+*/
 
 class Parser
 {
@@ -57,7 +29,7 @@ class Parser
     protected $imports;
     protected $autoEscape;
 
-    public function __construct(TokenStream $stream)
+    public function __construct(Stream $stream)
     {
         $this->stream  = $stream;
         $this->name    = $stream->getName();
@@ -80,6 +52,7 @@ class Parser
             'macro'         => 'parseMacro',
             'import'        => 'parseImport',
             'include'       => 'parseInclude',
+            'module'        => 'parseModule',
         );
 
         $this->inForLoop  = 0;
@@ -537,6 +510,27 @@ class Parser
             $token, new IncludeNode($include, $token->getLine())
         );
         $this->stream->expect(Token::BLOCK_END_TYPE);
+        return $node;
+    }
+
+    protected function parseModule($token)
+    {
+        $name = $this->parseName()->getValue();
+        $args = false;
+        if ($this->stream->consume(Token::OPERATOR_TYPE, '(')) {
+            $args = array();
+            while (!$this->stream->test(Token::OPERATOR_TYPE, ')')) {
+                if (count($args)) {
+                    $this->stream->expect(Token::OPERATOR_TYPE, ',');
+                }
+                $args[] = $this->parseExpression();
+            }
+            $this->stream->expect(Token::OPERATOR_TYPE, ')');
+        }
+        $this->stream->expect(Token::BLOCK_END_TYPE);
+        $node = $this->parseIfModifier(
+            $token, new ModulesNode($name, $args, $token->getLine())
+        );
         return $node;
     }
 
