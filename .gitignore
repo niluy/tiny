@@ -1,8 +1,8 @@
-app/cache/*
+quill/cache/*
 .travis.yml
 
-app/config/app.php
+quill/config/app.php
 
-app/config/database.php
+quill/config/database.php
 
 test/*
