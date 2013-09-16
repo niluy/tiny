@@ -14,7 +14,7 @@ class Post extends Model
     }
     public function html()
     {
-        return apply_filters('post_content', $this->content);
+        return Filter::apply('post_content', $this->content);
     }
     public function url()
     {

@@ -3,7 +3,8 @@
 use Closure;
 use Exception;
 
-class Cache {
+class Cache
+{
     public static $drivers = array();
     public static $registrar = array();
     public static function driver($driver = null)

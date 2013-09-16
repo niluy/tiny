@@ -1,9 +1,3 @@
 <?php
 
-class Markdown extends Module
-{
-    public function __init()
-    {
-        $this->addAlias('post_content', 'wpautop');
-    }
-}
+Filter::add('post_content', 'wpautop');

@@ -14,7 +14,7 @@ Route::get('/home', function()
         ->take($perpage)
         ->skip(($page - 1) * $perpage)
         ->get();
-    return View::factory('site')->render('index', $vars);
+    return View::site('index.html', $vars);
 });
 
 Route::get('page/:page', function($page = 1)
@@ -27,23 +27,11 @@ Route::get('page/:page', function($page = 1)
         ->take($perpage)
         ->skip(($page - 1) * $perpage)
         ->get();
-    return View::factory('site')->render('index', $vars);
+    return View::site('index.html', $vars);
 });
 
 Route::get('post/:id', function($id)
 {
     $vars['post'] = Post::where('ID','=',$id)->fetch();
-    return View::factory('site')->render('post', $vars);
+    return View::site('post.html', $vars);
 });
-
-Route::post('comment', function()
-{
-    //$vars['post'] = Post::where('ID','=',$id)->fetch();
-    return;// View::render('post', $vars);
-});
-/*
-$urls['post'] = '(id)(slug)(year)(month)(day)';
-$urls['page'] = '(name)';
-$urls['category'] = '(cat)';
-$urls['tag'] = '(tag)';
-*/

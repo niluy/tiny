@@ -1,5 +1,6 @@
 <?php
 
-function abc($text = null) {
-    return $text.'abc';
+function r() {
+    global $end;
+    return $end;
 }

@@ -4,7 +4,7 @@
         {% block head %}
             <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
             <link rel="stylesheet" href="{{ theme_url('style.css') }}">
-            <link rel="stylesheet" href="{{ theme_url('blog.js') }}">
+            <link rel="stylesheet" href="{{ theme_url('theme.js') }}">
             <title>{% block title %}{% endblock %} - {{ blog.name }}</title>
         {% endblock %}
     </head>
@@ -39,8 +39,8 @@
             </div>
             <div id="footer">
                 {% block footer %}
-                    &copy; Copyright 2013 <a href="http://niluy.org/">niluy</a> | 
-                    <a href="https://github.com/niluy/niluy">Github</a>.
+                    &copy; Copyright 2013 <a href="http://quillos.org/">System</a> | 
+                    <a href="https://github.com/quillos/quill">Github</a>.
                     <br>
                     {{ r() }}, {{ runtime() }}, {{ memory_usage() }}
                 {% endblock %}

@@ -2,6 +2,7 @@
 
 use RuntimeException;
 use Exception;
+use System\UI;
 
 abstract class Template
 {
@@ -51,11 +52,11 @@ abstract class Template
     public function loadModule($module, $args)
     {
         try {
-            return \System\call_module_ui($module, $args);
+            return UI::apply($module, $args);
         } catch (Exception $e) {
             throw new RuntimeException(sprintf(
                 'error module %s (%s) from %s line %d',
-                $template, $e->getMessage(), static::PATH,
+                $module, $e->getMessage(), static::PATH,
                 $this->getLineTrace($e)
             ));
         }  

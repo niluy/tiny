@@ -12,36 +12,6 @@ function add_global($name, $value)
 {
     View::$vars[$name] = $value;
 }
-function apply_filters($tag, $value)
-{
-    global $filters;
-    if (!isset($filters) or !isset($filters[$tag])) return $value;
-    ksort($filters[$tag]);
-    foreach ($filters[$tag] as $functions)
-    {
-        foreach ($functions as $function)
-        {
-            if(is_callable($function))
-            {
-                $value = call_user_func_array($function, array($value));
-            }
-            elseif(is_array($function) and is_callable($func = $function[1]))
-            {
-                $value = call_user_func($func, $value);
-            }
-            elseif(is_string($function) and is_callable('\\System\\'.$function))
-            {
-                $value = call_user_func('\\System\\'.$function, $value);
-            }
-        }
-    }
-    return $value;
-}
-function add_filter($tag, $function, $priority = 10)
-{
-    global $filters;
-    $filters[$tag][$priority][] = $function;
-}
 function wpautop($pee, $br = true) {
     $pre_tags = array();
 
@@ -125,7 +95,7 @@ function asset_url($path = '')
     //if(Config::app('static')) {
     //    return rtrim(Config::app('static'), DS).ltrim($path, DS);
     //}
-    return rtrim(Config::get('app.url'), DS).'/app/static/'.ltrim($path, '/');
+    return rtrim(Config::get('app.url'), DS).'/quill/static/'.ltrim($path, '/');
 }
 function theme_url($path = '')
 {

@@ -5,35 +5,73 @@ use System\Template\Loader;
 
 class View
 {
-    public static $site = null;
-    public static $admin = null;
+    public static $loader = null;
     public static $vars = array();
-    public $name;
-    public function __construct($name = '')
+    public $from;
+    public function __construct($from = null)
     {
-        if(is_null(static::$$name)) {
-            $theme = Config::app('themes.'.$name);
-            $path = THEME.$theme.'/views';
-            if (!$theme) {
-                $path = APP.'views';
-            }
-            static::$$name = new Loader(array(
+        $this->from = $from;
+    }
+    public static function module($name = 'site') {
+        if (is_null(static::$loader))
+        {
+            static::$loader = new Loader(array(
                 'mode' => 0,
-                'source' => $path,
+                'source' => THEME.'default/views',
                 'target' => APP.'cache/templates',
             ));
         }
-        $this->name = $name;
-    }
-    public static function factory($name = 'site') {
-        return new static($name);
+        switch ($name) {
+            case 'site':
+                $from = null;
+                break;
+            case 'admin':
+                $from = APP.'views';
+                break;
+            default:
+                echo $from = MODULE . $name . '/views';
+                break;
+        }
+        return new static($from);
     }
     public function render($file, $vars = array())
     {
-        $name = $this->name;
         $vars = array_merge(static::$vars, $vars);
         try {
-            $template = static::$$name->load($file.'.html');
+            $template = static::$loader->load($file, $this->from);
+            $template->display($vars);
+        } catch (Exception $e) {
+            throw new Exception("Error Processing Request {$e->getMessage()}", 1);
+        }
+    }
+    public static function addGlobal($tag, $value)
+    {
+        static::$vars[$tag] = $value;
+    }
+    public static function __callStatic($module, $arguments)
+    {
+        if (is_null(static::$loader))
+        {
+            static::$loader = new Loader(array(
+                'mode' => 0,
+                'source' => THEME.'default/views',
+                'target' => APP.'cache/templates',
+            ));
+        }
+        switch ($module) {
+            case 'site':
+                $from = null;
+                break;
+            case 'admin':
+                $from = APP.'views';
+                break;
+            default:
+                $from = MODULE . $module . '/views';
+                break;
+        }
+        try {
+            $template = static::$loader->load(array_shift($arguments), $from);
+            $vars = array_merge(static::$vars, array_shift($arguments));
             $template->display($vars);
         } catch (Exception $e) {
             throw new Exception("Error Processing Request {$e->getMessage()}", 1);

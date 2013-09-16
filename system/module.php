@@ -1,20 +1,34 @@
 <?php namespace System;
 
-abstract class Module
+class Module
 {
-    protected function setPriority($name, $priority)
+    public static $modules;
+    public static function add($modules)
     {
+        $modules = func_get_args();
+        foreach ($modules as $module)
+        {
+            $path = MODULE . $module . DS;
+            require_path( $path . 'libs' . DS );
+            require_path( $path . 'models' . DS );
+            require_path( $path . 'routes' . DS );
+            require_i18n( $path . 'i18n' . DS );
+            require_file( $path . $module . EXT );
+        }
     }
-    protected function addAlias($name, $function, $priority = 10)
+
+    public static function addAdmin()
     {
-        add_filter($name, array(new static, $function), $priority);
+        $path = APP;
+        require_path( $path . 'libs' . DS );
+        require_path( $path . 'models' . DS );
+        require_path( $path . 'routes' . DS );
+        require_i18n( $path . 'i18n' . DS );
     }
-    protected function addModuleUI($module, $function)
+    public static function addSite($theme='default')
     {
-        add_module_ui($module, array(new static, $function));
-    }
-    protected function render($template, $vars = array())
-    {
-        return View::factory('site')->render($template, $vars);
+        $path = THEME . $theme . DS;
+        require_path( $path . 'libs' . DS );
+        require_i18n( $path . 'i18n' . DS );
     }
 }

@@ -1,6 +1,6 @@
 <?php namespace System\Template;
 
-use \RuntimeException;
+use RuntimeException;
 
 class Compiler
 {

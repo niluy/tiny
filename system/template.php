@@ -16,7 +16,7 @@ class Template
 			'source' => $source[0],
 			'target' => PATH.'test',
 		));
-		$template = $loader->load('layout/post.html');
+		$template = $loader->load('post.html', '/srv/www/tiny/test/template/layout/');
 		$template->display($vars);
     }
 }

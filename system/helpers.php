@@ -4,78 +4,22 @@ use ArrayIterator;
 use Traversable;
 use Countable;
 
-function add_admin_module($theme = 'default')
-{
-    $path = APP;
-    require_path( $path . 'libs' . DS );
-    require_path( $path . 'models' . DS );
-    require_path( $path . 'routes' . DS );
-    require_i18n( $path . 'i18n' . DS );
-}
-function add_site_theme($theme = 'default')
-{
-    $path = THEME . $theme . DS;
-    require_path( $path . 'libs' . DS );
-    require_i18n( $path . 'i18n' . DS );
-}
-function add_modules($module)
-{
-    $modules = func_get_args();
-    foreach ($modules as $module) {
-        $path = MODULE . $module . DS;
-        require_path( $path . 'libs' . DS );
-        require_path( $path . 'models' . DS );
-        require_path( $path . 'routes' . DS );
-        require_i18n( $path . 'i18n' . DS );
-        require_file( $path . $module . EXT );
-        call_module_init( $module );
-    }
-}
-function call_module_init( $module )
-{
-    $module = ucfirst($module);
-    call_user_func_array(array(new $module, '__init'), array());
-    /*if(is_callable($module))
-    {
-        call_user_func_array(array(new $module, '__init'), array());
-    }
-    elseif(is_callable($module = '\\System\\Module\\' . $module))
-    {
-        call_user_func_array(array(new $module, '__init'), array());
-    }*/
-}
-function call_module_ui($module, $args)
-{
-    global $modules;
-    if ( isset($modules) and isset($modules[$module])) {
-        return call_user_func_array($modules[$module], $args);
-    }
-}
-function add_module_ui($module, $function)
-{
-    global $modules;
-    $modules[$module] = $function;
-}
 function require_file($file)
 {
     if(!file_exists($file)) return;
     require_once $file;
 }
-function require_path($path) {
+function require_path($path)
+{
     if(!file_exists($path)) return;
-    if($handle = opendir($path))
+    foreach (glob($path.'*.php') as $file)
     {
-        while (false !== ($file = readdir($handle)))
-        {
-            if(preg_match('/\w+.php\b/', $file, $matches))
-            {
-                require_once $path.$matches[0];
-            }
-        }
-        closedir($handle);
+        //echo $file . '<br>';
+        require_once $file;
     }
 }
-function require_i18n($path) {
+function require_i18n($path)
+{
     I18n::$paths[] = $path;
 }
 function abs($obj = null)

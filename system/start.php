@@ -14,6 +14,8 @@ Error::register();
 
 require_once SYS . 'helpers' . EXT;
 
+require_once SYS . 'functions' . EXT;
+
 require_once APP . 'bootstrap' . EXT;
 
 $end = round((microtime(true) - $start), 5);

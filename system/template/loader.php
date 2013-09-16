@@ -1,7 +1,7 @@
 <?php namespace System\Template;
 
-use \Exception;
-use \RuntimeException;
+use Exception;
+use RuntimeException;
 
 class Loader
 {
@@ -24,9 +24,6 @@ class Loader
             'mode'    => self::RECOMPILE_NORMAL,
             'mkdir'   => 0777,
         );
-        if (!isset($options['adapter'])) {
-            $options['adapter'] = new FileAdapter($options['source']);
-        }
         if (!($target = realpath($options['target'])) || !is_dir($target)) {
             if ($options['mkdir'] === false) {
                 throw new RuntimeException(sprintf(
@@ -45,7 +42,6 @@ class Loader
             'source'  => $options['source'],
             'target'  => $target,
             'mode'    => $options['mode'],
-            'adapter' => $options['adapter'],
         );
         $this->paths = array();
         $this->cache = array();
@@ -56,26 +52,32 @@ class Loader
             return $template;
         }
         $source  = $this->options['source'];
-        $adapter = $this->options['adapter'];
-        $p = is_null($from) ? $template : dirname($from) . '/' . $template;
-        if (isset($this->paths[$p])) {
-            $path = $this->paths[$p];
+
+        if (is_readable($template))
+        {
+            $path = $template;
         } else {
-            $path = $adapter->getFile($p);
-            $path = realpath($path);
-            $this->paths[$path] = $path;
+            if (is_null($from)) {
+                $path = $source . '/' . $template;
+            } else {
+                if (is_dir($from)) {
+                    $path = $from . '/' . $template;
+                } else {
+                    $path = dirname($from) . '/' . $template;
+                }
+            }
+            if (!$path = realpath($path)) {
+                throw new RuntimeException(sprintf(
+                    '%s is not a valid readable template',
+                    $path . '|' . is_dir($from)
+                ));
+            }
         }
         $class = self::CLASS_PREFIX . md5($path);
         if (isset($this->cache[$class])) {
             return $this->cache[$class];
         }
         if (!class_exists($class, false)) {
-            if (!$adapter->isReadable($path)) {
-                throw new RuntimeException(sprintf(
-                    '%s is not a valid readable template',
-                    $path
-                ));
-            }
             $target = $this->options['target'] . '/' . $class . '.php';
             switch ($this->options['mode']) {
                 case self::RECOMPILE_ALWAYS:
@@ -87,11 +89,11 @@ class Loader
                 case self::RECOMPILE_NORMAL:
                 default:
                     $compile = !file_exists($target) ||
-                        filemtime($target) < $adapter->lastModified($path);
+                        filemtime($target) < filemtime($path);
                     break;
             }
             if ($compile) {
-                $lexer    = new Lexer($path, $adapter->getContents($path));
+                $lexer    = new Lexer($path, file_get_contents($path));
                 $parser   = new Parser($lexer->tokenize());
                 $compiler = new Compiler($parser->parse());
                 $compiler->compile($target);
@@ -101,156 +103,4 @@ class Loader
         $this->cache[$class] = new $class($this);
         return $this->cache[$class];
     }
-/*
-    public function normalizePath($path)
-    {
-        $path = preg_replace('#/{2,}#', '/', strtr($path, '\\', '/'));
-        $parts = array();
-        foreach (explode('/', $path) as $i => $part) {
-            if ($part === '..') {
-                if (!empty($parts)) array_pop($parts);
-            } elseif ($part !== '.') {
-                $parts[] = $part;
-            }
-        }
-        return $parts;
-    }
-
-    public function resolvePath($template, $from = '')
-    {
-        $source = implode('/', $this->normalizePath($this->options['source']));
-        $parts = $this->normalizePath(
-            $source . '/' . dirname($from) . '/' . $template
-        );
-        foreach ($this->normalizePath($source) as $i => $part) {
-            if ($part !== $parts[$i]) {
-                throw new RuntimeException(sprintf(
-                    '%s is outside the source directory',
-                    $template
-                ));
-            }
-        }
-        $path = trim(substr(implode('/', $parts), strlen($source)), '/');
-        return $path;
-    }
-
-    public function compile($template, $mode = null)
-    {
-        $source  = $this->options['source'];
-        $adapter = $this->options['adapter'];
-
-        if (isset($this->paths[$template])) {
-            $path = $this->paths[$template];
-        } else {
-            $path = $adapter->getFile($template);
-            $this->paths[$template] = $path;
-        }
-
-        $class = self::CLASS_PREFIX . md5($path);
-
-        if (!$adapter->isReadable($path)) {
-            throw new RuntimeException(sprintf(
-                '%s is not a valid readable template',
-                $template
-            ));
-        }
-        $target = $this->options['target'] . '/' . $class . '.php';
-        if (!isset($mode)) {
-            $mode = $this->options['mode'];
-        }
-        switch ($mode) {
-        case self::RECOMPILE_ALWAYS:
-            $compile = true;
-            break;
-        case self::RECOMPILE_NEVER:
-            $compile = !file_exists($target);
-            break;
-        case self::RECOMPILE_NORMAL:
-        default:
-            $compile = !file_exists($target) ||
-                filemtime($target) < $adapter->lastModified($path);
-            break;
-        }
-
-        if ($compile) {
-            $lexer    = new Lexer($path, $adapter->getContents($path));
-            $parser   = new Parser($lexer->tokenize());
-            $compiler = new Compiler($parser->parse());
-            $compiler->compile($target);
-        }
-        return $this;
-    }
-*/
-
-/*
-    public function isValid($template, &$error = null)
-    {
-        $source  = $this->options['source'];
-        $adapter = $this->options['adapter'];
-
-        $path = $this->resolvePath($template);
-
-        $class = self::CLASS_PREFIX . md5($path);
-
-        if (!$adapter->isReadable($path)) {
-            throw new RuntimeException(sprintf(
-                '%s is not a valid readable template',
-                $template
-            ));
-        }
-
-        try {
-            $lexer    = new Lexer($path, $adapter->getContents($path));
-            $parser   = new Parser($lexer->tokenize());
-            $compiler = new Compiler($parser->parse());
-        } catch (Exception $e) {
-            $error = $e->getMessage();
-            return false;
-        }
-        return true;
-    }
-    */
 }
-
-interface Adapter
-{
-    public function isReadable($path);
-    public function lastModified($path);
-    public function getFile($file);
-    public function getContents($path);
-}
-
-class FileAdapter implements Adapter
-{
-    protected $source;
-    public function __construct($source)
-    {
-        if (!($this->source = realpath($source)) || !is_dir($this->source)) {
-            throw new RuntimeException(sprintf(
-                'source directory %s not found',
-                $source
-            ));
-        }
-    }
-    public function isReadable($file)
-    {
-        return is_readable($file);
-    }
-    public function lastModified($file)
-    {
-        return filemtime($file);
-    }
-    public function getFile($file)
-    {
-        if (is_readable($file)) {
-            return $file;
-        } elseif (is_readable($file = $this->source. '/' . $file)) {
-            return $file;
-        }
-    }
-    public function getContents($file)
-    {
-        return file_get_contents($file);
-    }
-}
-

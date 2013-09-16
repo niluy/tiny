@@ -7,7 +7,7 @@ Route::before('auth', function()
 
 Route::get('login', 'auth', function()
 {
-    return View::factory('admin')->render('login');
+    return View::module('admin')->render('login.html');
 });
 
 Route::post('login', function()
@@ -17,7 +17,7 @@ Route::post('login', function()
     {
         $vars['message'] = 'Login Error!';
         $vars['user'] = $user;
-        return View::factory('admin')->render('login', $vars);
+        return View::module('admin')->render('login.html', $vars);
     }
     Redirect::to('admin');
 });

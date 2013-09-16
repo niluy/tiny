@@ -7,6 +7,7 @@ return array(
     'Cookie' => 'System\\Cookie',
     'DB' => 'System\\Database',
     'Error' => 'System\\Error',
+    'Filter' => 'System\\Filter',
     'Input' => 'System\\Input',
     'Query' => 'System\\Database\\Query',
     'Request' => 'System\\Request',
@@ -20,4 +21,5 @@ return array(
     'Auth' => 'System\\Auth',
     'Module' => 'System\\Module',
     'I18n' => 'System\\I18n',
+    'UI' => 'System\\UI',
 );
